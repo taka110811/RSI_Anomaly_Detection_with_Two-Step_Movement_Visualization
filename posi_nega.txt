@@ -27,7 +27,9 @@ plot(rsi_change, title="RSI Change", color=color.purple, linewidth=2)
 
 // 異常箇所をプロット（正方向の異常検知は赤い三角形、負方向の異常検知は青い三角形）
 plotshape(series=is_anomaly_posi, location=location.abovebar, color=color.red, style=shape.triangledown, size=size.small, title="Positive Anomaly Detected")
-plotshape(series=is_anomaly_nega, location=location.belowbar, color=color.blue, style=shape.triangleup, size=size.small, title="Negative Anomaly Detected")
+
+// 負方向の異常のプロット（位置をさらに下にし、サイズを小さく調整）
+plotshape(series=is_anomaly_nega, location=location.abovebar, color=color.blue, style=shape.triangledown, size=size.small, title="Negative Anomaly Detected")
 
 // 背景色を異常時に変更
 bgcolor(is_anomaly_posi ? color.new(color.red, 90) : na)
