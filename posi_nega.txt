@@ -1,0 +1,34 @@
+//@version=5
+indicator("RSI Anomaly Detection with Positive and Negative Movements", overlay=false)
+
+// ユーザーが設定できるパラメータ
+rsi_length = input.int(14, title="RSI Length")  // RSIの期間
+context_window = input.int(7, title="Context Window")  // 文脈ウィンドウの長さ
+
+// RSIの計算
+rsi = ta.rsi(close, rsi_length)
+
+// RSIの変動量を計算（1期間前と比較）
+rsi_change = rsi - rsi[1]
+
+// 一つ目の条件: RSIが+3〜5または-3〜5の範囲で動いた場合
+first_step_positive = rsi_change > 0 and rsi_change <= 5  // 正方向の変動
+first_step_negative = rsi_change < 0 and rsi_change >= -5  // 負方向の変動
+first_step = first_step_positive or first_step_negative  // 正負両方向を考慮
+
+// 二つ目の条件: 一つ目の条件が満たされた後、次のRSIが+8〜10または-8〜10の範囲で動いた場合
+second_step_positive = first_step[1] and rsi_change > 8 and rsi_change <= 20  // 正方向の変動
+second_step_negative = first_step[1] and rsi_change < -8 and rsi_change >= -20  // 負方向の変動
+second_step = second_step_positive or second_step_negative  // 正負両方向を考慮
+
+// 異常検知（2つのステップを満たした場合に異常とする）
+is_anomaly = second_step
+
+// RSIの変動量をプロット
+plot(rsi_change, title="RSI Change", color=color.purple, linewidth=2)
+
+// 異常箇所をプロット（異常が発生したら赤い三角形を表示）
+plotshape(series=is_anomaly, location=location.abovebar, color=color.red, style=shape.triangledown, size=size.small, title="Anomaly Detected")
+
+// 背景色を異常時に変更
+bgcolor(is_anomaly ? color.new(color.red, 90) : na)
